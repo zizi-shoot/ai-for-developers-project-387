@@ -74,3 +74,9 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Default TypeSpec output
+tsp-output/
+dist/
+
+node_modules/
