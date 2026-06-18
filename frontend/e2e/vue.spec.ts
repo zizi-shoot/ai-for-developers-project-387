@@ -58,9 +58,28 @@ test('владелец просматривает сгруппированные
   secondMeetingDate.setHours(12, 30, 0, 0)
 
   await page.route('http://127.0.0.1:4010/admin/bookings/upcoming', async (route) => {
+    const request = route.request()
+    const corsHeaders = {
+      'Access-Control-Allow-Origin': request.headers().origin ?? '*',
+      'Access-Control-Allow-Methods': 'GET, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+    }
+
+    // Мок воспроизводит CORS-ответ API для preflight и фактического GET-запроса.
+    if (request.method() === 'OPTIONS') {
+      await route.fulfill({ status: 204, headers: corsHeaders })
+      return
+    }
+
+    if (request.method() !== 'GET') {
+      await route.fulfill({ status: 405, headers: corsHeaders })
+      return
+    }
+
     await route.fulfill({
       status: 200,
       contentType: 'application/json',
+      headers: corsHeaders,
       body: JSON.stringify([
         {
           booking: {
