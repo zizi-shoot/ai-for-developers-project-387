@@ -2,6 +2,7 @@ import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 import { CreateEventTypePage } from '@/pages/event-type-create'
 import { EventTypesListPage } from '@/pages/event-types-list'
+import { UpcomingBookingsPage } from '@/pages/upcoming-bookings'
 import { OwnerShell } from '@/widgets/owner-shell'
 
 export const routes: RouteRecordRaw[] = [
@@ -22,6 +23,11 @@ export const routes: RouteRecordRaw[] = [
         path: 'event-types/new',
         name: 'event-type-create',
         component: CreateEventTypePage,
+      },
+      {
+        path: 'bookings/upcoming',
+        name: 'upcoming-bookings',
+        component: UpcomingBookingsPage,
       },
     ],
   },

@@ -49,3 +49,59 @@ test('владелец создаёт тип события', async ({ page }) =
     durationMinutes: 30,
   })
 })
+
+test('владелец просматривает сгруппированные предстоящие встречи', async ({ page }) => {
+  const meetingDate = new Date()
+  meetingDate.setDate(meetingDate.getDate() + 1)
+  meetingDate.setHours(10, 0, 0, 0)
+  const secondMeetingDate = new Date(meetingDate)
+  secondMeetingDate.setHours(12, 30, 0, 0)
+
+  await page.route('http://127.0.0.1:4010/admin/bookings/upcoming', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([
+        {
+          booking: {
+            id: 'booking-1',
+            eventTypeId: 'event-type-1',
+            startsAt: meetingDate.toISOString(),
+            guestName: 'Анна Смирнова',
+            guestEmail: 'anna@example.com',
+          },
+          eventType: {
+            id: 'event-type-1',
+            title: 'Консультация',
+            durationMinutes: 30,
+          },
+        },
+        {
+          booking: {
+            id: 'booking-2',
+            eventTypeId: 'event-type-2',
+            startsAt: secondMeetingDate.toISOString(),
+            guestName: 'Пётр Иванов',
+            guestEmail: 'petr@example.com',
+          },
+          eventType: {
+            id: 'event-type-2',
+            title: 'Разбор проекта',
+            durationMinutes: 60,
+          },
+        },
+      ]),
+    })
+  })
+
+  await page.goto('/admin/bookings/upcoming')
+
+  await expect(page.getByRole('heading', { name: 'Предстоящие встречи', level: 1 })).toBeVisible()
+  await expect(page.getByRole('heading', { level: 2 })).toHaveCount(1)
+  await expect(page.getByText('Консультация')).toBeVisible()
+  await expect(page.getByText('Разбор проекта')).toBeVisible()
+  await expect(page.getByRole('link', { name: 'anna@example.com' })).toHaveAttribute(
+    'href',
+    'mailto:anna@example.com',
+  )
+})

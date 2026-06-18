@@ -4,6 +4,7 @@ import { RouterLink, RouterView, useRoute } from 'vue-router'
 
 const route = useRoute()
 const eventTypesActive = computed(() => route.path.startsWith('/admin/event-types'))
+const bookingsActive = computed(() => route.path.startsWith('/admin/bookings'))
 </script>
 
 <template>
@@ -23,11 +24,14 @@ const eventTypesActive = computed(() => route.path.startsWith('/admin/event-type
           <span class="nav-dot" aria-hidden="true"></span>
           Типы событий
         </RouterLink>
-        <span class="nav-item nav-item--disabled" aria-disabled="true">
+        <RouterLink
+          class="nav-item"
+          :class="{ 'nav-item--active': bookingsActive }"
+          :to="{ name: 'upcoming-bookings' }"
+        >
           <span class="nav-dot" aria-hidden="true"></span>
           Предстоящие встречи
-          <small>Скоро</small>
-        </span>
+        </RouterLink>
       </nav>
 
       <div class="sidebar-footer">
@@ -46,6 +50,7 @@ const eventTypesActive = computed(() => route.path.startsWith('/admin/event-type
       </RouterLink>
       <nav aria-label="Мобильная навигация">
         <RouterLink :to="{ name: 'event-types-list' }">Типы событий</RouterLink>
+        <RouterLink :to="{ name: 'upcoming-bookings' }">Предстоящие встречи</RouterLink>
       </nav>
     </header>
 
@@ -126,17 +131,6 @@ const eventTypesActive = computed(() => route.path.startsWith('/admin/event-type
   border-radius: 50%;
 }
 
-.nav-item--disabled {
-  cursor: not-allowed;
-  opacity: 0.48;
-}
-
-.nav-item small {
-  margin-left: auto;
-  font-size: 0.65rem;
-  text-transform: uppercase;
-}
-
 .sidebar-footer {
   display: flex;
   align-items: center;
@@ -203,6 +197,11 @@ const eventTypesActive = computed(() => route.path.startsWith('/admin/event-type
     font-size: 0.78rem;
     font-weight: 600;
     text-decoration: none;
+  }
+
+  .mobile-header nav {
+    display: flex;
+    gap: 1rem;
   }
 
   .content {

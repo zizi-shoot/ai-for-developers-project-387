@@ -74,9 +74,7 @@ describe('создание типа события', () => {
   it('отправляет очищенные данные, блокирует повторный submit и переходит к списку', async () => {
     const user = userEvent.setup()
     let resolveRequest: ((response: Response) => void) | undefined
-    const fetchMock = vi.fn<
-      (input: RequestInfo | URL, init?: RequestInit) => Promise<Response>
-    >(
+    const fetchMock = vi.fn<(input: RequestInfo | URL, init?: RequestInit) => Promise<Response>>(
       (_input: RequestInfo | URL, _init?: RequestInit) =>
         new Promise<Response>((resolve) => {
           resolveRequest = resolve
@@ -128,5 +126,26 @@ describe('создание типа события', () => {
 
     expect(await screen.findByText('Проверьте параметры события')).toBeTruthy()
     expect(title).toHaveProperty('value', 'Консультация')
+  })
+})
+
+describe('навигация владельца', () => {
+  it('переходит к предстоящим встречам из меню', async () => {
+    const user = userEvent.setup()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn<typeof fetch>().mockResolvedValue(
+        new Response(JSON.stringify([]), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    )
+    const { router } = await renderApp('/admin/event-types')
+
+    await user.click(screen.getAllByRole('link', { name: 'Предстоящие встречи' })[0]!)
+
+    await waitFor(() => expect(router.currentRoute.value.name).toBe('upcoming-bookings'))
+    expect(screen.getByRole('heading', { name: 'Предстоящие встречи' })).toBeTruthy()
   })
 })
