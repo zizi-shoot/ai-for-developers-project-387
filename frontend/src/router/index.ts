@@ -1,14 +1,22 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 
 import { CreateEventTypePage } from '@/pages/event-type-create'
+import { EventBookingPage } from '@/pages/event-booking'
 import { EventTypesListPage } from '@/pages/event-types-list'
+import { PublicEventTypesPage } from '@/pages/public-event-types'
 import { UpcomingBookingsPage } from '@/pages/upcoming-bookings'
 import { OwnerShell } from '@/widgets/owner-shell'
 
 export const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: { name: 'event-types-list' },
+    name: 'public-event-types',
+    component: PublicEventTypesPage,
+  },
+  {
+    path: '/event-types/:eventTypeId',
+    name: 'event-booking',
+    component: EventBookingPage,
   },
   {
     path: '/admin',
