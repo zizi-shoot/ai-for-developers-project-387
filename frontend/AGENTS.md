@@ -19,6 +19,7 @@
 ## Тестирование
 
 - для unit-тестов используй Vitest, `@testing-library/vue` и `@testing-library/user-event`; тесты размещай рядом с проверяемым кодом или в `src/__tests__` с суффиксом `.spec.ts`
+- для моков API в e2e используй `mockApiRoute` из `e2e/mock-api.ts`, чтобы preflight и CORS-заголовки обрабатывались единообразно
 - проверяй поведение компонента с точки зрения пользователя: рендерь компонент через `render`, ищи элементы через `screen` по роли, label или видимому тексту
 - для действий пользователя создавай `const user = userEvent.setup()` в каждом тесте и вызывай `await user.click(...)`, `await user.type(...)`, `await user.keyboard(...)`, `await user.selectOptions(...)` или `await user.upload(...)`
 - не изменяй DOM напрямую через `element.value = ...` и `dispatchEvent`; `fireEvent` используй только для низкоуровневых событий, которые не покрывает `user-event`
