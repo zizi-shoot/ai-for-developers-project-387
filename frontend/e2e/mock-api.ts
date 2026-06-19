@@ -28,7 +28,7 @@ export async function mockApiRoute(
     }
 
     if (request.method() !== method) {
-      await route.fulfill({ status: 405, headers: corsHeaders })
+      await route.fallback()
       return
     }
 
