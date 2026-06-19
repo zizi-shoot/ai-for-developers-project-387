@@ -1,0 +1,70 @@
+{
+  "bootstrap-sha": "9314d4e76f577ee5f2e1444c679313e03acc8572",
+  "bump-minor-pre-major": false,
+  "bump-patch-for-minor-pre-major": false,
+  "include-v-in-tag": true,
+  "include-component-in-tag": false,
+  "changelog-sections": [
+    {
+      "type": "feat",
+      "section": "Новые возможности",
+      "hidden": false
+    },
+    {
+      "type": "fix",
+      "section": "Исправления",
+      "hidden": false
+    },
+    {
+      "type": "perf",
+      "section": "Производительность",
+      "hidden": false
+    },
+    {
+      "type": "docs",
+      "section": "Документация",
+      "hidden": false
+    },
+    {
+      "type": "refactor",
+      "section": "Рефакторинг",
+      "hidden": false
+    },
+    {
+      "type": "test",
+      "section": "Тесты",
+      "hidden": false
+    },
+    {
+      "type": "build",
+      "section": "Сборка",
+      "hidden": false
+    },
+    {
+      "type": "ci",
+      "section": "Непрерывная интеграция",
+      "hidden": false
+    },
+    {
+      "type": "chore",
+      "section": "Служебные изменения",
+      "hidden": false
+    },
+    {
+      "type": "style",
+      "section": "Стиль кода",
+      "hidden": false
+    },
+    {
+      "type": "revert",
+      "section": "Отменённые изменения",
+      "hidden": false
+    }
+  ],
+  "packages": {
+    ".": {
+      "release-type": "node",
+      "package-name": "ai-for-developers-project-387"
+    }
+  }
+}
