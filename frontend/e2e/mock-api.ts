@@ -21,8 +21,15 @@ export async function mockApiRoute(
         request.headers()['access-control-request-headers'] ?? 'Content-Type',
     }
 
-    // Централизованно эмулирует CORS-контракт API для preflight и фактических запросов.
     if (request.method() === 'OPTIONS') {
+      const requestedMethod = request.headers()['access-control-request-method']?.toUpperCase()
+
+      // Передаёт preflight обработчику мока фактического метода запроса.
+      if (requestedMethod !== method) {
+        await route.fallback()
+        return
+      }
+
       await route.fulfill({ status: 204, headers: corsHeaders })
       return
     }
