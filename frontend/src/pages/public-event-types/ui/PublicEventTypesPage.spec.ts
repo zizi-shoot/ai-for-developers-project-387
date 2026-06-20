@@ -60,7 +60,7 @@ function jsonResponse(body: unknown, status = 200) {
 
 function requestPath(input: RequestInfo | URL) {
   const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
-  return new URL(url).pathname
+  return new URL(url, 'http://localhost').pathname.replace(/^\/api/, '')
 }
 
 function mockPublicRequests(

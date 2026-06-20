@@ -29,6 +29,11 @@ function futureSlot(hours = 10) {
   return date.toISOString()
 }
 
+function requestPath(input: RequestInfo | URL) {
+  const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+  return new URL(url, 'http://localhost').pathname.replace(/^\/api/, '')
+}
+
 async function renderPage() {
   const router = createRouter({
     history: createMemoryHistory(),
@@ -65,7 +70,7 @@ describe('гостевое бронирование', () => {
     vi.stubGlobal(
       'fetch',
       vi.fn<typeof fetch>((input, init) => {
-        const path = new URL(typeof input === 'string' ? input : input instanceof URL ? input : input.url).pathname
+        const path = requestPath(input)
         if (path === '/event-types') return Promise.resolve(jsonResponse([eventType]))
         if (path.endsWith('/slots')) return Promise.resolve(jsonResponse([{ startsAt }]))
 
@@ -107,7 +112,7 @@ describe('гостевое бронирование', () => {
     vi.stubGlobal(
       'fetch',
       vi.fn<typeof fetch>((input) => {
-        const path = new URL(typeof input === 'string' ? input : input instanceof URL ? input : input.url).pathname
+        const path = requestPath(input)
         if (path === '/event-types') return Promise.resolve(jsonResponse([eventType]))
         if (path.endsWith('/slots')) {
           slotsRequestCount += 1
@@ -134,7 +139,7 @@ describe('гостевое бронирование', () => {
     vi.stubGlobal(
       'fetch',
       vi.fn<typeof fetch>((input) => {
-        const path = new URL(typeof input === 'string' ? input : input instanceof URL ? input : input.url).pathname
+        const path = requestPath(input)
         return Promise.resolve(jsonResponse(path === '/event-types' ? [eventType] : []))
       }),
     )
@@ -148,7 +153,7 @@ describe('гостевое бронирование', () => {
     vi.stubGlobal(
       'fetch',
       vi.fn<typeof fetch>((input) => {
-        const path = new URL(typeof input === 'string' ? input : input instanceof URL ? input : input.url).pathname
+        const path = requestPath(input)
         return Promise.resolve(jsonResponse(path === '/event-types' ? [] : []))
       }),
     )

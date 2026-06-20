@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"net/http"
 	"os"
@@ -20,13 +21,19 @@ import (
 	"github.com/zizi-shoot/ai-for-developers-project-387/backend/internal/repository"
 )
 
-const (
-	defaultHTTPAddress = "127.0.0.1:4010"
-	defaultOrigins     = "http://127.0.0.1:5173,http://localhost:5173"
-)
-
 func main() {
 	logger := slog.New(slog.NewJSONHandler(os.Stdout, nil))
+	httpAddress, err := requiredEnv("HTTP_ADDR")
+	if err != nil {
+		logger.Error("configuration failed", "error", err)
+		os.Exit(1)
+	}
+	corsAllowedOrigins, err := requiredEnv("CORS_ALLOWED_ORIGINS")
+	if err != nil {
+		logger.Error("configuration failed", "error", err)
+		os.Exit(1)
+	}
+
 	clock := platform.SystemClock{}
 	ids := platform.UUIDGenerator{}
 	store := repository.NewMemory()
@@ -38,8 +45,8 @@ func main() {
 	api := httpapi.New(ownerService, eventTypeService, availabilityService, bookingService)
 
 	server := &http.Server{
-		Addr:              envOrDefault("HTTP_ADDR", defaultHTTPAddress),
-		Handler:           api.Handler(logger, allowedOrigins(), ids),
+		Addr:              httpAddress,
+		Handler:           api.Handler(logger, allowedOrigins(corsAllowedOrigins), ids),
 		ReadHeaderTimeout: 5 * time.Second,
 		ReadTimeout:       10 * time.Second,
 		WriteTimeout:      15 * time.Second,
@@ -66,13 +73,14 @@ func main() {
 	logger.Info("http server stopped")
 }
 
-func envOrDefault(name, fallback string) string {
-	if value := strings.TrimSpace(os.Getenv(name)); value != "" {
-		return value
+func requiredEnv(name string) (string, error) {
+	value := strings.TrimSpace(os.Getenv(name))
+	if value == "" {
+		return "", fmt.Errorf("environment variable %s is required", name)
 	}
-	return fallback
+	return value, nil
 }
 
-func allowedOrigins() []string {
-	return strings.Split(envOrDefault("CORS_ALLOWED_ORIGINS", defaultOrigins), ",")
+func allowedOrigins(value string) []string {
+	return strings.Split(value, ",")
 }

@@ -3,11 +3,8 @@ interface ErrorResponse {
   message: string
 }
 
-const fallbackApiBaseUrl = 'http://127.0.0.1:4010'
-
 function getApiBaseUrl() {
-  const configuredBaseUrl = import.meta.env.VITE_API_BASE_URL?.trim()
-  return (configuredBaseUrl || fallbackApiBaseUrl).replace(/\/$/, '')
+  return import.meta.env.VITE_API_BASE_URL.trim().replace(/\/$/, '')
 }
 
 function isErrorResponse(value: unknown): value is ErrorResponse {

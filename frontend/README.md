@@ -31,8 +31,25 @@ pnpm install
 
 ### Compile and Hot-Reload for Development
 
+Создайте корневой `.env` по образцу `.env.sample` и задайте обязательные переменные:
+
+```dotenv
+VITE_API_BASE_URL=/api
+API_PROXY_TARGET=http://127.0.0.1:4010
+```
+
 ```sh
 pnpm dev
+```
+
+Frontend обращается к API по относительному пути `/api`. При локальной разработке Vite
+проксирует такие запросы на адрес из `API_PROXY_TARGET` и удаляет префикс `/api`.
+
+В production reverse proxy должен направлять `/api/*` на backend, также удаляя префикс
+`/api`. Для production-сборки необходимо задать публичный адрес API:
+
+```dotenv
+VITE_API_BASE_URL=https://api.example.com
 ```
 
 ### Type-Check, Compile and Minify for Production

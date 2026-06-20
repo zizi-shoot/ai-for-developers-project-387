@@ -1,6 +1,6 @@
 import type { Page, Route } from '@playwright/test'
 
-const apiBaseUrl = 'http://127.0.0.1:4010'
+const apiBaseUrl = '**/api'
 
 type ApiMethod = 'DELETE' | 'GET' | 'PATCH' | 'POST' | 'PUT'
 type ApiMockResponse = NonNullable<Parameters<Route['fulfill']>[0]>

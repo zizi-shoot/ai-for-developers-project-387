@@ -75,7 +75,9 @@ describe('страница типов событий владельца', () => 
     expect(screen.getByText('Обсудим задачу и следующие шаги.')).toBeTruthy()
     expect(screen.getByText('30 мин')).toBeTruthy()
     expect(screen.getByText('Разбор проекта')).toBeTruthy()
-    expect(new URL(String(fetchMock.mock.calls[0]?.[0])).pathname).toBe('/admin/event-types')
+    expect(new URL(String(fetchMock.mock.calls[0]?.[0]), 'http://localhost').pathname).toBe(
+      '/api/admin/event-types',
+    )
   })
 
   it('показывает skeleton во время первой загрузки', () => {
