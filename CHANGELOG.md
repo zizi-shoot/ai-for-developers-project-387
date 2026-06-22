@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/zizi-shoot/ai-for-developers-project-387/compare/v0.2.0...v0.3.0) (2026-06-22)
+
+
+### Новые возможности
+
+* **frontend:** обновил favicon ([4a841b7](https://github.com/zizi-shoot/ai-for-developers-project-387/commit/4a841b7efcc71a3ed7ee7b5d425e7f90b7d9812e))
+* **frontend:** обновил название страницы ([ba39e6b](https://github.com/zizi-shoot/ai-for-developers-project-387/commit/ba39e6b4f4af42aa659d0896122de02bcbaccfae))
+
 ## [0.2.0](https://github.com/zizi-shoot/ai-for-developers-project-387/compare/v0.1.0...v0.2.0) (2026-06-22)
 
 
