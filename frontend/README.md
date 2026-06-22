@@ -46,7 +46,8 @@ Frontend обращается к API по относительному пути 
 проксирует такие запросы на адрес из `API_PROXY_TARGET` и удаляет префикс `/api`.
 
 В production reverse proxy должен направлять `/api/*` на backend, также удаляя префикс
-`/api`. Для production-сборки необходимо задать публичный адрес API:
+`/api`. Единый Docker-образ из корня проекта собирает frontend со значением `/api`.
+Для отдельной production-сборки frontend можно задать публичный адрес API:
 
 ```dotenv
 VITE_API_BASE_URL=https://api.example.com

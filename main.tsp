@@ -23,6 +23,12 @@ model ErrorResponse {
   message: string;
 }
 
+@doc("Состояние готовности приложения принимать HTTP-запросы.")
+model HealthResponse {
+  @doc("Текущее состояние приложения.")
+  status: "ok";
+}
+
 @doc("Один заранее заданный владелец календаря.")
 model Owner {
   @doc("Идентификатор владельца календаря.")
@@ -142,6 +148,15 @@ model NotFoundResponse {
 model ConflictResponse {
   @statusCode statusCode: 409;
   @body body: ErrorResponse;
+}
+
+@tag("System")
+@route("/healthz")
+interface SystemOperations {
+  @summary("Проверить готовность приложения")
+  @doc("Возвращает успешный ответ, когда HTTP API готов принимать запросы.")
+  @get
+  getHealth(): OkResponse<HealthResponse>;
 }
 
 @tag("Owner")

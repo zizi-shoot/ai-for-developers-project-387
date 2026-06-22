@@ -41,6 +41,21 @@ func TestReadEndpointsReturnContractShapes(t *testing.T) {
 	}
 }
 
+func TestHealthEndpoint(t *testing.T) {
+	response := performRequest(newHandler(), http.MethodGet, "/healthz", "", nil)
+
+	if response.Code != http.StatusOK || response.Header().Get("Content-Type") != "application/json; charset=utf-8" {
+		t.Fatalf("GET /healthz status=%d content-type=%q", response.Code, response.Header().Get("Content-Type"))
+	}
+	var value struct {
+		Status string `json:"status"`
+	}
+	decodeResponse(t, response, &value)
+	if value.Status != "ok" {
+		t.Fatalf("health response = %#v", value)
+	}
+}
+
 func TestCreateEventTypeAndListSlots(t *testing.T) {
 	handler := newHandler()
 	body := `{"title":"  Консультация  ","description":"  Обсуждение задачи  ","durationMinutes":30}`

@@ -41,6 +41,7 @@ func New(
 
 func (api *API) Handler(logger *slog.Logger, allowedOrigins []string, ids platform.IDGenerator) http.Handler {
 	mux := http.NewServeMux()
+	mux.HandleFunc("GET /healthz", api.getHealth)
 	mux.HandleFunc("GET /owner", api.getOwner)
 	mux.HandleFunc("GET /event-types", api.listEventTypes)
 	mux.HandleFunc("GET /event-types/{eventTypeId}/slots", api.listSlots)
@@ -50,6 +51,10 @@ func (api *API) Handler(logger *slog.Logger, allowedOrigins []string, ids platfo
 	mux.HandleFunc("GET /admin/bookings/upcoming", api.listUpcomingBookings)
 
 	return requestID(ids, requestLogger(logger, recoverPanic(logger, cors(allowedOrigins, mux))))
+}
+
+func (api *API) getHealth(writer http.ResponseWriter, _ *http.Request) {
+	writeJSON(writer, http.StatusOK, healthResponse{Status: "ok"})
 }
 
 func (api *API) getOwner(writer http.ResponseWriter, _ *http.Request) {
@@ -106,6 +111,10 @@ func (api *API) listUpcomingBookings(writer http.ResponseWriter, _ *http.Request
 type errorResponse struct {
 	Code    string `json:"code"`
 	Message string `json:"message"`
+}
+
+type healthResponse struct {
+	Status string `json:"status"`
 }
 
 func writeError(writer http.ResponseWriter, err error) {

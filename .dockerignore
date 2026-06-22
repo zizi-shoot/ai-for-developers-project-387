@@ -1,0 +1,12 @@
+.git
+.github
+.idea
+.env
+.env.*
+!.env.sample
+**/node_modules
+**/dist
+**/playwright-report
+**/test-results
+tsp-output
+CHANGELOG.md
