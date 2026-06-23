@@ -112,7 +112,7 @@ jobs:
         if: ${{ always() && steps.validate_target.outcome == 'success' }}
         id: opencode_analysis
         continue-on-error: true
-        uses: anomalyco/opencode/github@latest
+        uses: anomalyco/opencode/github@77fc88c8ade8e5a620ebbe1197f3a572d29ae91a # latest/github-v1.2.19
         env:
           OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
@@ -189,8 +189,11 @@ jobs:
           path: |
             .lighthouseci/
             lighthouse-artifacts/
+            !.lighthouseci/**/.env*
+            !lighthouse-artifacts/**/.env*
           if-no-files-found: warn
           retention-days: 14
+          include-hidden-files: true
 
       - name: Завершить job с ошибкой при провале LHCI-аудита
         if: ${{ always() && steps.validate_target.outcome == 'success' && (steps.lhci_collect.outcome != 'success' || steps.lhci_assert.outcome != 'success' || steps.lhci_upload.outcome != 'success') }}
