@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.3.2](https://github.com/zizi-shoot/ai-for-developers-project-387/compare/v0.3.1...v0.3.2) (2026-06-23)
+
+
+### Непрерывная интеграция
+
+* **lighthouse:** исключил отчеты из коммита ([ac1730b](https://github.com/zizi-shoot/ai-for-developers-project-387/commit/ac1730bd4dffae31ac423c3d715d8be15df7a4fe))
+
 ## [0.3.1](https://github.com/zizi-shoot/ai-for-developers-project-387/compare/v0.3.0...v0.3.1) (2026-06-23)
 
 
