@@ -108,6 +108,14 @@ jobs:
             --color FFC107 \
             --force
 
+      - name: Исключить отчеты Lighthouse из git
+        if: ${{ always() && steps.validate_target.outcome == 'success' }}
+        run: |
+          {
+            echo ".lighthouseci/"
+            echo "${LIGHTHOUSE_ARTIFACT_DIR%/}/"
+          } >> .git/info/exclude
+
       - name: Проанализировать отчет Lighthouse через OpenCode
         if: ${{ always() && steps.validate_target.outcome == 'success' }}
         id: opencode_analysis
