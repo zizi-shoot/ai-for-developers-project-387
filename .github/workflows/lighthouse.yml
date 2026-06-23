@@ -1,0 +1,199 @@
+name: Аудит Lighthouse
+
+on:
+  schedule:
+    - cron: "20 1 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+  id-token: write
+
+env:
+  LIGHTHOUSE_TARGET_URL: ${{ vars.LIGHTHOUSE_TARGET_URL }}
+  LIGHTHOUSE_ARTIFACT_DIR: lighthouse-artifacts
+
+jobs:
+  lighthouse:
+    name: Ночной аудит Lighthouse
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+
+    steps:
+      - name: Получить код репозитория
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Проверить URL сайта
+        id: validate_target
+        run: |
+          if [ -z "$LIGHTHOUSE_TARGET_URL" ]; then
+            echo "::error::Обязательная переменная репозитория LIGHTHOUSE_TARGET_URL не задана."
+            exit 1
+          fi
+
+      - name: Настроить Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6.4.0
+        with:
+          node-version: 24.12.0
+
+      - name: Подготовить конфигурацию LHCI
+        run: |
+          mkdir -p "$LIGHTHOUSE_ARTIFACT_DIR"
+          node <<'NODE'
+          const { writeFileSync } = require('node:fs')
+          const { join } = require('node:path')
+
+          const targetUrl = `${process.env.LIGHTHOUSE_TARGET_URL.replace(/\/+$/, '')}/`
+          const config = {
+            ci: {
+              collect: {
+                url: [targetUrl],
+                numberOfRuns: 3,
+                settings: {
+                  chromeFlags: '--no-sandbox',
+                },
+              },
+              assert: {
+                assertions: {
+                  'categories:performance': ['error', { minScore: 0.7 }],
+                  'categories:accessibility': ['error', { minScore: 0.9 }],
+                  'categories:best-practices': ['error', { minScore: 0.9 }],
+                  'categories:seo': ['error', { minScore: 0.9 }],
+                },
+              },
+            },
+          }
+
+          writeFileSync(
+            join(process.env.RUNNER_TEMP, 'lighthouserc.json'),
+            `${JSON.stringify(config, null, 2)}\n`,
+          )
+          NODE
+
+      - name: Собрать отчеты Lighthouse
+        id: lhci_collect
+        continue-on-error: true
+        run: npx --yes @lhci/cli@0.15.1 collect --config="$RUNNER_TEMP/lighthouserc.json"
+
+      - name: Проверить пороги Lighthouse
+        id: lhci_assert
+        continue-on-error: true
+        run: npx --yes @lhci/cli@0.15.1 assert --config="$RUNNER_TEMP/lighthouserc.json"
+
+      - name: Экспортировать отчеты Lighthouse
+        id: lhci_upload
+        continue-on-error: true
+        run: |
+          npx --yes @lhci/cli@0.15.1 upload \
+            --config="$RUNNER_TEMP/lighthouserc.json" \
+            --target=filesystem \
+            --outputDir="$LIGHTHOUSE_ARTIFACT_DIR/lhci"
+
+      - name: Подготовить директорию артефактов
+        if: ${{ always() && steps.validate_target.outcome == 'success' }}
+        run: mkdir -p "$LIGHTHOUSE_ARTIFACT_DIR"
+
+      - name: Проверить метку для Lighthouse issue
+        if: ${{ always() && steps.validate_target.outcome == 'success' && (steps.lhci_collect.outcome != 'success' || steps.lhci_assert.outcome != 'success' || steps.lhci_upload.outcome != 'success') }}
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh label create lighthouse \
+            --description "Ночной аудит Lighthouse" \
+            --color FFC107 \
+            --force
+
+      - name: Проанализировать отчет Lighthouse через OpenCode
+        if: ${{ always() && steps.validate_target.outcome == 'success' }}
+        id: opencode_analysis
+        continue-on-error: true
+        uses: anomalyco/opencode/github@latest
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GH_TOKEN: ${{ github.token }}
+          LIGHTHOUSE_TARGET_URL: ${{ env.LIGHTHOUSE_TARGET_URL }}
+          LIGHTHOUSE_ARTIFACT_DIR: ${{ env.LIGHTHOUSE_ARTIFACT_DIR }}
+          LIGHTHOUSE_RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          LHCI_COLLECT_OUTCOME: ${{ steps.lhci_collect.outcome }}
+          LHCI_ASSERT_OUTCOME: ${{ steps.lhci_assert.outcome }}
+          LHCI_UPLOAD_OUTCOME: ${{ steps.lhci_upload.outcome }}
+          SHOULD_UPDATE_LIGHTHOUSE_ISSUE: ${{ steps.lhci_collect.outcome != 'success' || steps.lhci_assert.outcome != 'success' || steps.lhci_upload.outcome != 'success' }}
+        with:
+          model: opencode/deepseek-v4-flash-free
+          prompt: |
+            Проанализируй этот плановый запуск Lighthouse-аудита.
+
+            Входные данные:
+            - URL сайта: ${{ env.LIGHTHOUSE_TARGET_URL }}
+            - Сырые данные LHCI: .lighthouseci/
+            - Экспортированные отчеты LHCI: ${{ env.LIGHTHOUSE_ARTIFACT_DIR }}/lhci/
+            - URL запуска workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            - результат collect: ${{ steps.lhci_collect.outcome }}
+            - результат assert: ${{ steps.lhci_assert.outcome }}
+            - результат upload: ${{ steps.lhci_upload.outcome }}
+            - Нужно обновить Lighthouse issue: ${{ steps.lhci_collect.outcome != 'success' || steps.lhci_assert.outcome != 'success' || steps.lhci_upload.outcome != 'success' }}
+
+            Всегда запиши краткий Markdown-отчет в файл:
+            ${{ env.LIGHTHOUSE_ARTIFACT_DIR }}/lighthouse-analysis.md
+
+            Отчет должен содержать:
+            - вердикт: успех или провал
+            - таблицу оценок категорий performance, accessibility, best practices и SEO, если данные доступны
+            - основные риски или регрессии, видимые в результатах Lighthouse
+            - 3-5 конкретных дальнейших действий
+            - ссылку на запуск workflow и имя артефакта `lighthouse-report`
+
+            Не включай скрытые рассуждения или chain-of-thought. Дай только итоговый структурированный анализ.
+            Не изменяй исходный код, файлы зависимостей или workflow-файлы.
+
+            Если значение "Нужно обновить Lighthouse issue" выше равно "true":
+            - создай или обнови открытый GitHub issue для этого провала
+            - используй метку `lighthouse`
+            - по возможности переиспользуй существующий открытый issue с меткой `lighthouse` или заголовком про Lighthouse-аудит
+            - помести полный Markdown-анализ в тело issue или комментарий
+            - добавь URL запуска workflow и упомяни артефакт `lighthouse-report`
+
+            Если значение "Нужно обновить Lighthouse issue" выше равно "false":
+            - не создавай GitHub issues и не оставляй комментарии в них
+
+      - name: Проверить наличие артефакта анализа
+        if: ${{ always() && steps.validate_target.outcome == 'success' }}
+        run: |
+          mkdir -p "$LIGHTHOUSE_ARTIFACT_DIR"
+          if [ ! -s "$LIGHTHOUSE_ARTIFACT_DIR/lighthouse-analysis.md" ]; then
+            {
+              echo "# Анализ Lighthouse"
+              echo
+              echo "::warning::OpenCode не создал lighthouse-analysis.md."
+              echo
+              echo "- URL сайта: $LIGHTHOUSE_TARGET_URL"
+              echo "- результат collect: ${{ steps.lhci_collect.outcome }}"
+              echo "- результат assert: ${{ steps.lhci_assert.outcome }}"
+              echo "- результат upload: ${{ steps.lhci_upload.outcome }}"
+              echo "- Запуск workflow: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            } > "$LIGHTHOUSE_ARTIFACT_DIR/lighthouse-analysis.md"
+            echo "::warning::Анализ OpenCode отсутствует; создан резервный артефакт."
+          fi
+
+      - name: Загрузить артефакт отчета Lighthouse
+        if: ${{ always() && steps.validate_target.outcome == 'success' }}
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: lighthouse-report
+          path: |
+            .lighthouseci/
+            lighthouse-artifacts/
+          if-no-files-found: warn
+          retention-days: 14
+
+      - name: Завершить job с ошибкой при провале LHCI-аудита
+        if: ${{ always() && steps.validate_target.outcome == 'success' && (steps.lhci_collect.outcome != 'success' || steps.lhci_assert.outcome != 'success' || steps.lhci_upload.outcome != 'success') }}
+        run: |
+          echo "::error::LHCI-аудит завершился с ошибкой. Подробности доступны в артефакте lighthouse-report."
+          exit 1
