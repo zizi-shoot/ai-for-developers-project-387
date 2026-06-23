@@ -1,0 +1,34 @@
+[
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.73,
+    "values": [
+      0.73,
+      0.73,
+      0.73
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "accessibility",
+    "auditId": "categories",
+    "level": "error",
+    "url": "https://ai-for-developers-project-387-xtjh.onrender.com/"
+  },
+  {
+    "name": "minScore",
+    "expected": 0.9,
+    "actual": 0.82,
+    "values": [
+      0.82,
+      0.82,
+      0.82
+    ],
+    "operator": ">=",
+    "passed": false,
+    "auditProperty": "seo",
+    "auditId": "categories",
+    "level": "error",
+    "url": "https://ai-for-developers-project-387-xtjh.onrender.com/"
+  }
+]

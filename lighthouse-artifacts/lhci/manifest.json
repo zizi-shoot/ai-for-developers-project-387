@@ -1,0 +1,38 @@
+[
+  {
+    "url": "https://ai-for-developers-project-387-xtjh.onrender.com/",
+    "isRepresentativeRun": false,
+    "htmlPath": "/home/runner/work/ai-for-developers-project-387/ai-for-developers-project-387/lighthouse-artifacts/lhci/ai_for_developers_project_387_xtjh_onrender_com--2026_06_23_21_01_42.report.html",
+    "jsonPath": "/home/runner/work/ai-for-developers-project-387/ai-for-developers-project-387/lighthouse-artifacts/lhci/ai_for_developers_project_387_xtjh_onrender_com--2026_06_23_21_01_42.report.json",
+    "summary": {
+      "performance": 0.95,
+      "accessibility": 0.73,
+      "best-practices": 1,
+      "seo": 0.82
+    }
+  },
+  {
+    "url": "https://ai-for-developers-project-387-xtjh.onrender.com/",
+    "isRepresentativeRun": false,
+    "htmlPath": "/home/runner/work/ai-for-developers-project-387/ai-for-developers-project-387/lighthouse-artifacts/lhci/ai_for_developers_project_387_xtjh_onrender_com--2026_06_23_21_01_54.report.html",
+    "jsonPath": "/home/runner/work/ai-for-developers-project-387/ai-for-developers-project-387/lighthouse-artifacts/lhci/ai_for_developers_project_387_xtjh_onrender_com--2026_06_23_21_01_54.report.json",
+    "summary": {
+      "performance": 0.96,
+      "accessibility": 0.73,
+      "best-practices": 1,
+      "seo": 0.82
+    }
+  },
+  {
+    "url": "https://ai-for-developers-project-387-xtjh.onrender.com/",
+    "isRepresentativeRun": true,
+    "htmlPath": "/home/runner/work/ai-for-developers-project-387/ai-for-developers-project-387/lighthouse-artifacts/lhci/ai_for_developers_project_387_xtjh_onrender_com--2026_06_23_21_01_29.report.html",
+    "jsonPath": "/home/runner/work/ai-for-developers-project-387/ai-for-developers-project-387/lighthouse-artifacts/lhci/ai_for_developers_project_387_xtjh_onrender_com--2026_06_23_21_01_29.report.json",
+    "summary": {
+      "performance": 0.95,
+      "accessibility": 0.73,
+      "best-practices": 1,
+      "seo": 0.82
+    }
+  }
+]
