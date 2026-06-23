@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.3.1](https://github.com/zizi-shoot/ai-for-developers-project-387/compare/v0.3.0...v0.3.1) (2026-06-23)
+
+
+### Исправления
+
+* **ci:** учел замечания к lighthouse workflow ([5d7c0cc](https://github.com/zizi-shoot/ai-for-developers-project-387/commit/5d7c0cc8facb971a2d79568880e478502c5efbd6))
+
+
+### Непрерывная интеграция
+
+* **lighthouse:** добавил ночной аудит сайта ([10df2d1](https://github.com/zizi-shoot/ai-for-developers-project-387/commit/10df2d1309d76d10a0cff3daa30b7fb582314132))
+
 ## [0.3.0](https://github.com/zizi-shoot/ai-for-developers-project-387/compare/v0.2.0...v0.3.0) (2026-06-22)
 
 
